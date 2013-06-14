@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Usage: servers [-h] [-v] pattern1 [pattern2 ...]
+#. 	-h - prints help
+# 	-v - prints server host names for each a list of associated aliases
+
+#grep -v "*" ~/.ssh/config | grep -A1 -i -E "^host (search-pro|mdcp-itg)" | awk 'tolower($1) ~ /hostname/ {print $2}'
+
+#grep -v "*" ~/.ssh/config | grep -i "^host" | grep -A1 -i -E "^host\s+(search-pro|mdcp-itg)" | awk 'tolower($1) ~ /hostname/ {print $2}'
+
+#grep -v "*" ~/.ssh/config | grep -i "^host" | grep -A1 -i -E "^host\s+" | \
+#awk 'tolower($1) ~ /^host$/ {names=""; for (i=2; i<=NF; ++i) {names=names" "$i}} tolower($1) ~ /^hostname$/ {print $2 " -" names}'
+
+
+# split("", names) => it's an idiom to delete all items from the array
+
+function print_all_servers {
+	awk '
+		BEGIN {maxlength=0}
+		tolower($1) ~ /^host$/ && $0 !~ /*/ {\
+			split("", names); \
+			for (i=2; i<=NF; ++i) {\
+				names[i]=$i; \
+				if (length($i) > maxlength) {maxlength=length($i)}
+			}
+		}
+		tolower($1) ~ /^hostname$/ {\
+			for (n in names) {hosts[names[n]]=$2}
+		}
+		END {for (h in hosts) {printf "%-"maxlength"s  %s\n", h, hosts[h]}}' ~/.ssh/config \
+	| sort
+}
+
+if [ "$1" = "-h" ]; then
+	echo "Usage: TBD"
+	exit 0
+fi
+
+what_to_print="hosts"
+
+if [[ "$1" = "-v" ]]; then
+	what_to_print="all"
+	shift
+elif [[ "$1" = "-n" ]]; then
+	what_to_print="names"
+	shift
+fi
+
+# copy $@ to args array to join its elements (following line) using '|' separator
+args=("$@")
+pattern=$(IFS=$'|'; echo "${args[*]}")
+
+#echo "DEBUG: pattern: $pattern, what: $what_to_print" >> /tmp/servers.log
+
+[[ -z "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers
+[[ -z "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers | awk '{print $1}'
+[[ -z "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers | awk '{print $2}'
+[[ -n "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers | awk '$1 ~ /'$pattern'/ {print $0}'
+[[ -n "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers | awk '$1 ~ /'$pattern'/ {print $1}'
+[[ -n "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers | awk '$1 ~ /'$pattern'/ {print $2}'
+
