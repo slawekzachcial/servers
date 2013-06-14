@@ -1,0 +1,59 @@
+# App1 PRO
+
+Host app1-pro-web-s001
+HostName s001.company.com
+
+Host app1-pro-web-s002
+HostName s002.company.com
+
+Host app1-pro-app-s003
+HostName s003.company.com
+
+Host app1-pro-app-s004
+HostName s004.company.com
+
+Host app1-pro-db-s005
+HostName s005.company.com
+
+Host app1-pro-db-s006
+HostName s006.company.com
+
+
+# App1 TEST
+
+Host app1-test-web-s007
+HostName s007.company.com
+
+Host app1-test-app-s008
+HostName s008.company.com
+
+Host app1-test-db-s009
+HostName s009.company.com
+
+
+# App2 PRO
+
+Host app2-pro-web-s010
+HostName s010.company.com
+
+Host app2-pro-app-s011
+HostName s011.company.com
+
+Host app2-pro-app-s012
+HostName s012.company.com
+
+Host app2-pro-db-s013
+HostName s013.company.com
+
+
+# App2 TEST
+
+Host app2-test-web-s007
+HostName s007.company.com
+
+Host app2-test-app-s008
+HostName s008.company.com
+
+Host app2-test-db-s009
+HostName s009.company.com
+
