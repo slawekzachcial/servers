@@ -16,11 +16,11 @@ function print_all_servers {
 		tolower($1) ~ /^hostname$/ {\
 			for (n in names) {hosts[names[n]]=$2}
 		}
-		END {for (h in hosts) {printf "%-"maxlength"s  %s\n", h, hosts[h]}}' "$1" \
-	| sort
+		END {for (h in hosts) {printf "%-"maxlength"s  %s\n", h, hosts[h]}}' "$1"
 }
 
 function print_help_and_exit {
+	echo
 	echo "Usage: servers [options...] pattern1 [pattern2 ...]"
 	echo
 	echo " Print host names corresponding to Host values matching specified patterns"
@@ -56,10 +56,13 @@ pattern=$(IFS=$'|'; echo "${args[*]}")
 
 [[ "$print_debug" = "yes" ]] && printf "DEBUG: what_to_print=[%s], data_file=[%s], pattern=[%s]\n" $what_to_print $data_file $pattern 1>&2
 
-[[ -z "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers "$data_file" 
-[[ -z "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers "$data_file" | awk '{print $1}'
-[[ -z "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers "$data_file" | awk '{print $2}'
-[[ -n "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $0}'
-[[ -n "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $1}'
-[[ -n "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $2}'
+function print_output {
+	[[ -z "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers "$data_file"
+	[[ -z "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers "$data_file" | awk '{print $1}'
+	[[ -z "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers "$data_file" | awk '{print $2}'
+	[[ -n "$pattern" ]] && [[ "$what_to_print" = "all" ]]   && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $0}'
+	[[ -n "$pattern" ]] && [[ "$what_to_print" = "names" ]] && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $1}'
+	[[ -n "$pattern" ]] && [[ "$what_to_print" = "hosts" ]] && print_all_servers "$data_file" | awk '$1 ~ /'$pattern'/ {print $2}'
+}
 
+print_output | sort | uniq
